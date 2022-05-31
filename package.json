@@ -1,0 +1,19 @@
+{
+  "name": "ws-schedule",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hm1996/ws-schedule.git"
+  },
+  "author": "Humar Moreno",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hm1996/ws-schedule/issues"
+  },
+  "homepage": "https://github.com/hm1996/ws-schedule#readme"
+}
