@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+html(lang="en")
+    head
+        include partials/header
+    body
+        script(src="/dist/js/sweetalert2.all.min.js")
+        script(src="/js/app.js")
+        section.hero.banner.is-small 
+            .hero-body.has-text-centered 
+                .columns 
+                    .column.is-6.is-offset-3 
+                        h1.title.page-title #{title}
+                    .column.is-3.has-text-centered.logo
+                        figure.media-right 
+                            img(src="/img/logo.png")
+        .columns.is-fullheight 
+            .column.is-narrow
+                aside.menu.is-large
+                    br
+                    ul.menu-list 
+                        li
+                            span &nbsp;Draw and drop items: 
+                        li
+                            span &nbsp;Send a message
+                        li
+                            span &nbsp;Send a template
+                        li
+                            span &nbsp;Delay
+            .column
+                br
+                .container.is-fluid
+
+        script(src="/dist/js/jsplumb/jsplumb.util.umd.js")
+        script(src="/dist/js/jsplumb/jsplumb.common.umd.js")
+        script(src="/dist/js/jsplumb/jsplumb.core.umd.js")
+        script(src="/dist/js/jsplumb/jsplumb.connector-flowchart.umd.js")
+        script(src="/dist/js/jsplumb/jsplumb.browser-ui.umd.js")
+                

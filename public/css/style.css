@@ -1,0 +1,56 @@
+input {
+    border-radius: 20px 20px !important;
+    font-weight: bold;
+}
+
+input.text {
+    background-color: mediumpurple !important;
+    color: white !important;
+}
+
+input.text::placeholder {
+    color: gainsboro !important;
+}
+
+body {
+    height: 100vh !important;
+    width: 100vw !important;
+    overflow-y: none !important;
+}
+
+html::-webkit-scrollbar {
+    display: none;
+}
+
+body.login {
+    background-color: black;
+}
+
+.banner {
+    background-color: mediumpurple !important;
+    align-items: center !important;
+    vertical-align: middle !important;
+}
+
+aside {
+    border-right: 3px solid gray !important;
+}
+
+.page-title {
+    margin-top: 1vw;
+    color: white !important;
+    font-weight: bold;
+}
+
+.selected {
+    background-color: #b4b4b4 !important;
+    color: #363636 !important;
+}
+
+.triggers, .flows {
+    width: 100%;
+}
+
+.action {
+    margin: 2px;
+}

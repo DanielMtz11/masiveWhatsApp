@@ -15,5 +15,18 @@
   "bugs": {
     "url": "https://github.com/hm1996/ws-schedule/issues"
   },
-  "homepage": "https://github.com/hm1996/ws-schedule#readme"
+  "homepage": "https://github.com/hm1996/ws-schedule#readme",
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "connect-flash": "^0.1.1",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "express-session": "^1.17.3",
+    "node-schedule": "^2.1.0",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
+    "pug": "^3.0.2",
+    "sqlite3": "^5.0.8",
+    "whatsapp-business": "^1.2.3"
+  }
 }

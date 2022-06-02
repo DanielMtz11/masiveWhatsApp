@@ -1,0 +1,21 @@
+extends layout 
+
+block content 
+    .columns 
+        .column.is-4 
+            h1.title Settings
+            form(method="POST" action="/settings/save")
+                .field
+                    .control.has-icons-left
+                        label.label.is-medium Whatsapp Business ID:
+                        input.input(type="text" name="wbi" placeholder="Type the WPI" value=wbi)
+                    .control.has-icons-left
+                        label.label.is-medium Auth Token:
+                        input.input(type="text" name="auth" placeholder="Type the WPI auth token" value=auth)
+                .field
+                    .control
+                        button.button.is-info Save
+
+    if saved === true
+        script.
+            (function(){Swal.fire('Saved!', 'Your file has been saved.', 'success')})()

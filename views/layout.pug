@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+html(lang="en")
+    head
+        include partials/header
+    body
+        script(src="/dist/js/sweetalert2.all.min.js")
+        script(src="/js/app.js")
+        section.hero.banner.is-small 
+            .hero-body.has-text-centered 
+                .columns 
+                    .column.is-6.is-offset-3 
+                        h1.title.page-title #{title}
+                    .column.is-3.has-text-centered.logo
+                        figure.media-right 
+                            img(src="/img/logo.png")
+        .columns.is-fullheight 
+            .column.is-narrow
+                aside.menu.is-large
+                    br
+                    ul.menu-list 
+                        li
+                            a(href="/" class=(selected === "settings" ? "selected" : ""))
+                                span.icon-text 
+                                    span.icon
+                                        i.fas.fa-duotone.fa-gear
+                                    span &nbsp;Settings 
+                        li
+                            a(href="/flows" class=(selected === "flows" ? "selected" : ""))
+                                span.icon-text 
+                                    span.icon
+                                        i.fas.fa-duotone.fa-bezier-curve
+                                    span &nbsp;Flows
+                        li
+                            a(href="/triggers" class=(selected === "triggers" ? "selected" : ""))
+                                span.icon-text 
+                                    span.icon
+                                        i.fas.fa-duotone.fa-person-running
+                                    span &nbsp;Triggers
+                        li
+                            a(onclick="logout()")
+                                span.icon-text 
+                                    span.icon
+                                        i.fas.fa-duotone.fa-door-open
+                                    span &nbsp;Log out
+            .column
+                br
+                .container.is-fluid
+                    block content

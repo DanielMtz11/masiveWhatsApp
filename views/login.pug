@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+html(lang="en")
+    head
+        include partials/header
+        link(rel="stylesheet", href="/css/login.css")
+    body.login
+        section.hero.banner.is-small 
+            .hero-body 
+                .column.is-2.is-offset-10 
+                    figure.media-right 
+                        img(src="/img/logo.png")
+        br
+        br
+        br
+        .section.section
+            .columns
+                .column.is-4.is-offset-4
+                    form#form.box.has-text-centered(method="POST" action="/login")
+                        h3.title.is-3 WS-SCHEDULER LOGIN
+                        br
+                        .field
+                            p.control.has-icons-left.has-icons-right
+                                input.input.is-medium.text.has-text-centered(type="text" name="user" placeholder="Username")
+                                span.icon.is-small.is-left 
+                                    i.fas.fa-duotone.fa-user
+                        .field
+                            p.control.has-icons-left.has-icons-right
+                                input.input.is-medium.text.has-text-centered(type="password" name="pass" placeholder="Password")
+                                span.icon.is-small.is-left 
+                                    i.fas.fa-duotone.fa-lock
+                        br
+                        .field
+                            .control
+                                input.button(type="submit" value="Log in")
+                        br
+                        //.field.actions 
+                            a(href="/signup") Do you want to create a new user?, request one.
+                            a(href="/reset") Did you forget your password?

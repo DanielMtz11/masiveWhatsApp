@@ -1,0 +1,37 @@
+extends layout 
+include mixins/actions
+block content
+    .columns 
+        .column.is-10 
+            h1.title Triggers
+        .column.is-2
+            a.button(href="/triggers/new") Add
+    .columns 
+        .column
+            table.table.triggers
+                thead
+                    tr 
+                        th Name
+                        th Actions
+                        th Active
+                tbody 
+                    if triggers.length == 0
+                        tr 
+                            td No Triggers Found
+                            td 
+                            td 
+                    else 
+                        each trigger in triggers 
+                            tr 
+                                td #{trigger.name}
+                                +actions(trigger.id, '/triggers/')
+                                td(style="padding-left: 25px;") 
+                                    label.checkbox
+                                        input(type="checkbox" style="width: 20px; height: 20px;" onclick="activateItem(this, '/triggers/', " + trigger.id + ")" checked=(trigger.active == 1))
+    if messages['triggers'] && messages['triggers'][0]['confirmation']
+        if  messages['triggers'][0]['confirmation']['result']
+            script.
+                (function(){Swal.fire('Success!', 'The trigger was #{messages['triggers'][0]['confirmation']['message']}', 'success')})()
+        else
+            script.
+                (function(){Swal.fire('Error!', 'The trigger was not #{messages['triggers'][0]['confirmation']['message']}', 'error')})()

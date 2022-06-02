@@ -1,0 +1,38 @@
+extends layout 
+include mixins/actions
+block content
+    .columns 
+        .column.is-10 
+            h1.title Flows
+        .column.is-2
+            a.button(href="/flows/new") Add
+    .columns 
+        .column
+            table.table.flows
+                thead
+                    tr 
+                        th Name
+                        th Actions
+                        th Active
+                tbody 
+                    if flows.length == 0
+                        tr 
+                            td No Flows Found
+                            td 
+                            td
+                    else 
+                        each flow in flows 
+                            tr 
+                                td #{flow.name}
+                                +actions(flow.id, '/flows/')
+                                td(style="padding-left: 25px;") 
+                                    label.checkbox
+                                        input(type="checkbox" style="width: 20px; height: 20px;" onclick="activateItem(this, '/flows/', " + flow.id + ")" checked=(flow.active == 1))
+
+    if messages['flows'] && messages['flows'][0]['confirmation']
+        if  messages['flows'][0]['confirmation']['result']
+            script.
+                (function(){Swal.fire('Success!', 'The flow was #{messages['flows'][0]['confirmation']['message']}', 'success')})()
+        else
+            script.
+                (function(){Swal.fire('Error!', 'The flow was not #{messages['flows'][0]['confirmation']['message']}', 'error')})()
