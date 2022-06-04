@@ -15,7 +15,6 @@ input.text::placeholder {
 body {
     height: 100vh !important;
     width: 100vw !important;
-    overflow-y: none !important;
 }
 
 html::-webkit-scrollbar {
@@ -34,6 +33,13 @@ body.login {
 
 aside {
     border-right: 3px solid gray !important;
+    height: 80vh;
+    background-color: whitesmoke;
+    padding-left: 10px;
+}
+
+.columns {
+
 }
 
 .page-title {
@@ -53,4 +59,105 @@ aside {
 
 .action {
     margin: 2px;
+}
+
+#canvas {
+    height: 78vh;
+    background: white;
+    background-image: radial-gradient(gainsboro 1px, transparent 0);
+    background-size: 15px 15px;
+    background-position: 9px 9px;
+}
+
+.flow-item {
+    background-color: #fff;
+    border-radius: 6px;
+    box-shadow: 0 0.5em 1em -0.125em rgb(10 10 10 / 10%), 0 0 0 1px rgb(10 10 10 / 2%);
+    color: #4a4a4a;
+    display: block;
+    padding: 1.25rem;
+    position: absolute;
+    cursor: grab;
+}
+
+.flow-item:active {
+    cursor: grabbing;
+}
+
+.flow-item.jtk-drag {
+    cursor: grabbing;
+}
+
+.jtk-drag-select * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;    
+}    
+
+.dot-source:hover, .dot-target:hover {
+    cursor: pointer;
+}
+
+.dot-target {
+    border: gray solid 1px;
+    border-radius: 100%;
+}
+
+.dot-target.jtk-endpoint-connected:hover {
+    cursor: pointer;
+    border: gray solid 1px;
+    background-color: green;
+    border-radius: 100%;
+}
+
+.dot-target-hover {
+    border: green solid 1px;
+    border-radius: 100%;
+}
+
+.jtk-floating-endpoint {
+    opacity: 0;
+    background-color: transparent;
+}
+
+.jtk-floating-endpoint:hover {
+    background-color: transparent;
+    opacity: 1;
+    border: gray solid 1px;
+    border-radius: 100%;
+}
+
+.fb-item {
+    padding: 10px;
+}
+
+.fb-item-button {
+    opacity: 1;
+    cursor: pointer;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none; 
+}
+
+.fb-item-button:hover {
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.fb-item-button:active {
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.back-button {
+    font-size: 5rem; 
+    margin-left: 1.7vw; 
+    margin-top: 1.7vw; 
+    color: whitesmoke;
 }

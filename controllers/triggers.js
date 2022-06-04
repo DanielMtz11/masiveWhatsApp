@@ -17,6 +17,11 @@ const newPage = async (req, res) => {
     });
 }
 
+const all = async (req, res) => {
+    let triggers = await Triggers.list('') || [];
+    res.json({ result: true, triggers});
+}
+
 const duplicate = async (req, res) => {
     let id = req.params.id;
     let trigger = await Triggers.findById(id);
@@ -52,4 +57,4 @@ const activate = async (req, res) => {
     res.json({ result });
 }
 
-module.exports = { page, newPage, duplicate, remove, activate };
+module.exports = { page, newPage, duplicate, remove, activate, all };

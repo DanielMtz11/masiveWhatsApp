@@ -1,8 +1,11 @@
 const Crud = require('../modules/crud');
 
 class Settings extends Crud {
+    db = undefined;
+
     constructor() {
         super();
+        this.db = require('../db/db');
     }
 
     async add(name, type, value) {

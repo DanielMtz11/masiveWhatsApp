@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+html(lang="en")
+    head
+        include partials/header
+    body
+        script(src="/dist/js/sweetalert2.all.min.js")
+        script(src="/js/app.js")
+        section.hero.banner.is-small 
+            .hero-body 
+                .columns.is-gapless
+                    .column.is-3 
+                        a.icon.back-button(href="/flows")
+                            i.fas.fa-duotone.fa-angle-left 
+                    .column.is-6.has-text-centered
+                        h1.title.page-title #{title}
+                    .column.is-3.has-text-centered.logo
+                        figure.media-right 
+                            img(src="/img/logo.png")
+        .columns
+            .column.is-narrow
+                aside.menu.is-large
+                    br
+                    ul.menu-list
+                        li
+                            span &nbsp;Click to add items: 
+                        li.fb-item
+                            .box.fb-item-button(onclick="addItem('trigger')") 
+                                span.icon-text
+                                    span.icon
+                                        i.fas.fa-duotone.fa-rocket 
+                                    span &nbsp; Trigger
+                        li.fb-item
+                            .box.fb-item-button(onclick="addItem('message')") 
+                                span.icon-text
+                                    span.icon
+                                         i.fas.fa-duotone.fa-message
+                                    span &nbsp; Send a message
+                        li.fb-item
+                            .box.fb-item-button(onclick="addItem('template')") 
+                                span.icon-text
+                                    span.icon
+                                         i.fas.fa-duotone.fa-comment 
+                                    span &nbsp; Send a template
+                        li.fb-item
+                            .box.fb-item-button(onclick="addItem('delay')") 
+                                span.icon-text
+                                    span.icon
+                                         i.fas.fa-duotone.fa-clock
+                                    span &nbsp; Delay
+            .column
+                br
+                .columns
+                    .column.is-10#canvas(style="position: relative;")
+                    .column.is-2.has-text-centered
+                        .columns
+                            .column.has-text-centered
+                                button.button.is-success.is-light(onclick="saveFlow(this)") Save
+                        .columns
+                            .column.has-text-centered 
+                                a.button(href="/flows") Cancel
+                        .columns
+                            .column.has-text-centered(onclick="exportFlow(elem)") 
+                                button.button.is-info.is-light Export
+
+        script(src="/dist/js/jsplumb/jsplumb.util.umd.js")
+        script(src="/dist/js/jsplumb/jsplumb.common.umd.js")
+        script(src="/dist/js/jsplumb/jsplumb.core.umd.js")
+        script(src="/dist/js/jsplumb/jsplumb.connector-flowchart.umd.js")
+        script(src="/dist/js/jsplumb/jsplumb.browser-ui.umd.js")
+        script.
+            let flowInfo = !{flow};
+        script(src="/js/crudFlow.js")
+                

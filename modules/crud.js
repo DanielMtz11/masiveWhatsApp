@@ -1,33 +1,27 @@
 const db = require('../db/db');
 
 class Crud {
-    db = undefined;
-
-    constructor() {
-        this.db = db;
-    }
-
     async list(active = 1) {
-        return await this.db.all(this, 'active = ' + active);
+        return await db.all(this, 'active = ' + active);
     }
 
     async find(name) {
-        return await this.db.find(this, 'name = "' + name + '"');
+        return await db.find(this, 'name = "' + name + '"');
     }
 
     async save() {
         if (this.id !== "") {
-            return await this.db.update(this);
+            return await db.update(this);
         }
-        return await this.db.insert(this);
+        return await db.insert(this);
     }
 
     async update() {
-        return await this.db.update(this);
+        return await db.update(this);
     }
 
     async remove() {
-        return await this.db.remove(this, 'id = ' + this.id);
+        return await db.remove(this, 'id = ' + this.id);
     }
 
     static async findById(id) {

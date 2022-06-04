@@ -17,13 +17,18 @@ module.exports = () => {
     router.post('/settings/save', auth.isAuthenticated, settings.save);
 
     router.get('/flows', auth.isAuthenticated, flows.page);
-    router.get('/flows/new', auth.isAuthenticated, flows.newPage);
+    router.get('/flows/new', auth.isAuthenticated, flows.crudPage);
+    router.post('/flows/new', auth.isAuthenticated, flows.crudFlow);
+    router.get('/flows/edit/:id', auth.isAuthenticated, flows.crudPage);
+    router.post('/flows/edit/:id', auth.isAuthenticated, flows.crudFlow);
     router.get('/flows/duplicate/:id', auth.isAuthenticated, flows.duplicate);
     router.get('/flows/delete/:id', auth.isAuthenticated, flows.remove);
     router.get('/flows/activate/:id', auth.isAuthenticated, flows.activate);
 
     router.get('/triggers', auth.isAuthenticated, triggers.page);
+    router.get('/triggers/all', auth.isAuthenticated, triggers.all);
     router.get('/triggers/new', auth.isAuthenticated, triggers.newPage);
+    router.get('/triggers/edit/:id', auth.isAuthenticated, triggers.newPage);
     router.get('/triggers/duplicate/:id', auth.isAuthenticated, triggers.duplicate);
     router.get('/triggers/delete/:id', auth.isAuthenticated, triggers.remove);
     router.get('/triggers/activate/:id', auth.isAuthenticated, triggers.activate);

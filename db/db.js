@@ -39,18 +39,21 @@ class DB {
         let flowsTable = `CREATE TABLE IF NOT EXISTS "flows" (
             "id" INTEGER,
             "name" TEXT,
-            "active" TEXT,
+            "trigger" INTEGER,
+            "step": INTEGER,
             "detail" TEXT,
             "created" TEXT,
+            "status": TEXT,
+            "active" TEXT,
             PRIMARY KEY("id" AUTOINCREMENT)
+            FOREIGN KEY("trigger") REFERENCES triggers (id)
         );`;
         
         let triggersTable = `CREATE TABLE IF NOT EXISTS "triggers" (
             "id" INTEGER,
             "name" TEXT,
             "conditions" TEXT,
-            "flow" INTEGER,
-            "step" INTEGER,
+            "type" TEXT,
             "status" TEXT,
             "active" INTEGER,
             PRIMARY KEY("id" AUTOINCREMENT),

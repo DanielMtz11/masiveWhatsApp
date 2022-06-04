@@ -10,13 +10,44 @@ const page = async (req, res) => {
     });
 }
 
-const newPage = async (req, res) => {
-    res.render('newFlow', {
-        title: 'Flow Builder',
+const crudPage = async (req, res) => {
+    let id = req.params.id;
+
+    let title = 'Flow Builder';
+    let flow = {};
+    if (id !== undefined) {
+        flow = await Flows.findById(id);
+        title += ' - ' + flow.name;
+        flow.detail = JSON.parse(flow.detail);
+    }
+
+    res.render('crudFlow', {
+        title,
+        flow: JSON.stringify(flow),
         messages: req.flash()
     });
 }
 
+const crudFlow = async (req, res) => {
+    let id = req.params.id;
+    let { name, detail } = req.body;
+
+    if (name === undefined || detail === undefined) {
+        return res.json({ result: false });
+    }
+
+    let flow = {};
+    if (id !== undefined) {
+        flow = await Flows.findById(id);
+        flow.name = name;
+        flow.detail = detail;
+    } else {
+        flow = new Flows(name, detail);
+    }
+
+    let result = await flow.save();
+    res.json({ result, flow });
+}
 const duplicate = async (req, res) => {
     let id = req.params.id;
     let flow = await Flows.findById(id);
@@ -52,4 +83,4 @@ const activate = async (req, res) => {
     res.json({ result });
 }
 
-module.exports = { page, newPage, duplicate, remove, activate };
+module.exports = { page, crudPage, duplicate, remove, activate, crudFlow };
