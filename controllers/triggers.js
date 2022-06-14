@@ -10,15 +10,47 @@ const page = async (req, res) => {
     });
 }
 
-const newPage = async (req, res) => {
-    res.render('newTrigger', {
-        title: 'Trigger Builder',
+async function crudPage(req, res) {
+    let id = req.params.id;
+
+    let title = 'Trigger Builder';
+    let trigger = {};
+    if (id !== undefined) {
+        trigger = await Triggers.findById(id);
+        title += ' - ' + trigger.name;
+        trigger.set({conditions: trigger.conditions});
+    }
+
+    res.render('crudTrigger', {
+        title,
+        trigger,
         messages: req.flash()
     });
 }
 
+async function crudTrigger(req, res) {
+    let id = req.params.id;
+    let { name, conditions, config, type } = req.body;
+
+    if (name === undefined || conditions === undefined || config === undefined || type === undefined) {
+        return res.json({ result: false });
+    }
+
+    let trigger = {};
+    if (id !== undefined) {
+        trigger = await Triggers.findById(id);
+        trigger.set({name, conditions, config, type, active: 0});
+    } else {
+        trigger = new Triggers({name, conditions, config, type, active: 0});
+    }
+
+    let result = await trigger.save();
+    res.json({ result, trigger });
+}
+
 const all = async (req, res) => {
-    let triggers = await Triggers.list('') || [];
+    let status = req.query.status || '';
+    let triggers = await Triggers.list(status === 'active' ? 1 : '') || [];
     res.json({ result: true, triggers});
 }
 
@@ -28,9 +60,7 @@ const duplicate = async (req, res) => {
     let triggers = await Triggers.list('') || [];
     let baseName = trigger.name.split(' - duplicated').shift();
     let sameName = triggers.filter(item => item.name.indexOf(baseName) !== -1);
-    trigger.name = baseName + ' - duplicated(' + (sameName.length) + ')';
-    trigger.active = 0;
-    trigger.id = "";
+    trigger.set({name: baseName + ' - duplicated(' + (sameName.length) + ')', active: 0, id: ""});
     let result = await trigger.save();
     req.flash('triggers', { confirmation: { message: 'duplicated', result } });
     res.redirect('/triggers');
@@ -51,10 +81,18 @@ const activate = async (req, res) => {
     let trigger = await Triggers.findById(id);
     if (!trigger) res.redirect('/triggers');
 
-    trigger.active = req.query.active;
+    trigger.set({active: req.query.active});
 
     let result = await trigger.save();
     res.json({ result });
 }
 
-module.exports = { page, newPage, duplicate, remove, activate, all };
+const conditionElement = async (req, res) => {
+    let number = req.params.number;
+    res.render('partials/condition', {
+        number,
+        condition: {}
+    });
+}
+
+module.exports = { page, crudPage, crudTrigger, duplicate, remove, activate, all, conditionElement };

@@ -1,31 +1,29 @@
 const Crud = require('../modules/crud');
+let db = require('../db/db');
 
 class Settings extends Crud {
-    db = undefined;
-
     constructor() {
         super();
-        this.db = require('../db/db');
     }
 
     async add(name, type, value) {
-        return await this.db.insert({ name, type, value }, 'settings');
+        return await db.insert({ name, type, value }, 'settings');
     }
 
     async modify(name, value) {
-        let setting = await this.db.find(this, 'name = "' + name + '"');
+        let setting = await db.find(this, 'name = "' + name + '"');
         if (!this.validate(setting['type'], value)) {
             return false;
         }
 
-        return await this.db.update({
+        return await db.update(this, {
             id: setting['id'],
             value
         }, 'settings');
     }
 
     async get(name) {
-        return await this.db.find(this, 'name = "' + name + '"');
+        return await db.find(this, 'name = "' + name + '"');
     }
 
     validate(type, value) {

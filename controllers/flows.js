@@ -1,6 +1,9 @@
+const WB = require('../modules/whatsapp');
 const Flows = require('../models/flows');
+const Settings = require('../models/settings');
+const flowFiles = require('../modules/flows-files');
 
-const page = async (req, res) => {
+async function page(req, res) {
     let flows = await Flows.list('') || [];
     res.render('flows', {
         title: 'WS Scheduler',
@@ -10,7 +13,7 @@ const page = async (req, res) => {
     });
 }
 
-const crudPage = async (req, res) => {
+async function crudPage(req, res) {
     let id = req.params.id;
 
     let title = 'Flow Builder';
@@ -18,7 +21,7 @@ const crudPage = async (req, res) => {
     if (id !== undefined) {
         flow = await Flows.findById(id);
         title += ' - ' + flow.name;
-        flow.detail = JSON.parse(flow.detail);
+        flow.set({detail: flow.detail});
     }
 
     res.render('crudFlow', {
@@ -28,9 +31,9 @@ const crudPage = async (req, res) => {
     });
 }
 
-const crudFlow = async (req, res) => {
+async function crudFlow(req, res) {
     let id = req.params.id;
-    let { name, detail } = req.body;
+    let { name, trigger, detail } = req.body;
 
     if (name === undefined || detail === undefined) {
         return res.json({ result: false });
@@ -39,48 +42,142 @@ const crudFlow = async (req, res) => {
     let flow = {};
     if (id !== undefined) {
         flow = await Flows.findById(id);
-        flow.name = name;
-        flow.detail = detail;
+        flow.set({name, detail, trigger, status: '{}', step: '', active: 0});
     } else {
-        flow = new Flows(name, detail);
+        flow = new Flows({name, trigger, detail, active: 0});
     }
 
     let result = await flow.save();
+    await flowFiles.checkFlowsFiles();
     res.json({ result, flow });
 }
-const duplicate = async (req, res) => {
+
+async function duplicate(req, res) {
     let id = req.params.id;
     let flow = await Flows.findById(id);
     let flows = await Flows.list('') || [];
     let baseName = flow.name.split(' - duplicated').shift();
     let sameName = flows.filter(item => item.name.indexOf(baseName) !== -1);
-    flow.name = baseName + ' - duplicated(' + (sameName.length) + ')';
-    flow.active = 0;
-    flow.id = "";
+    flow.set({
+        name: baseName + ' - duplicated(' + (sameName.length) + ')',
+        active: 0,
+        status: '{}',
+        step: '',
+        id: ""
+    });
     let result = await flow.save();
+    await flowFiles.checkFlowsFiles();
     req.flash('flows', { confirmation: { message: 'duplicated', result } });
     res.redirect('/flows');
 }
 
-const remove = async (req, res) => {
+async function remove(req, res) {
     let id = req.params.id;
     let flow = await Flows.findById(id);
     if (!flow) res.redirect('/flows');
 
     let result = await flow.remove();
-    req.flash('flows', { confirmation: { message: 'deleted', result } });
+    flowFiles.deleteFlowFiles(flow.id);
+    req.flash('flows', { confirmation: { message: 'deleted', result }});
     res.redirect('/flows');
 }
 
-const activate = async (req, res) => {
+async function activate(req, res) {
     let id = req.params.id;
     let flow = await Flows.findById(id);
     if (!flow) res.redirect('/flows');
 
-    flow.active = req.query.active;
+    flow.set({ active: req.query.active, status: '{}', step: ''});
 
     let result = await flow.save();
     res.json({ result });
 }
 
-module.exports = { page, crudPage, duplicate, remove, activate, crudFlow };
+async function uploadFLowFiles(req, res) {
+    let id = req.params.id;
+    let verify = req.query.verify;
+
+    if (verify === 'yes') {
+        let fileName = req.query.name;
+        let result = flowFiles.verifyDuplicated(id, fileName);
+        return res.json({ result });
+    }
+    
+    let flow = await Flows.findById(id);
+    if (flow.id != id) {
+        return res.json({ result: false });
+    }
+    
+    if(!req.files) {
+        return res.json({ result: false });
+    }
+
+    let file = req.files.file;
+    let result = await flowFiles.uploadFile(id, file);
+    return res.json({ result: result === undefined });
+}
+
+async function getWBMsgTemplates(req, res) {
+    let settings = new Settings();
+    let wbi = await settings.get('wbi');
+    let pni = await settings.get('pni');
+    let auth = await settings.get('auth');
+
+    let wb = new WB({ 
+        authToken: auth.value, 
+        phoneNumberID: pni.value, 
+        whatsappBusinessID: wbi.value
+    });
+
+    let response = await wb.getMessageTemplates();
+
+    if (response.data) {
+        let templates = [];
+        for (let template of response.data) {
+            if (template.status !== 'APPROVED') continue;
+
+            templateInfo = {
+                id: template.id,
+                language: template.language,
+                name: template.name.split('_').map(item => item.toUpperCase()).join(' '),
+                category: template.category,
+                components: {},
+                inputs: 0
+            }
+
+            for (let component of template.components) {
+                let value = undefined;
+                if (component.type === 'BUTTONS') {
+                    value = component.buttons;
+                } else if (component. format === 'TEXT' || component.format === undefined) {
+                    value = component.text;
+                } else if (component.format !== '') {
+                    value = component.format;
+                }
+
+                templateInfo.components[component.type.toLowerCase()] = value;
+                
+                if (typeof value === 'string') {
+                    templateInfo.inputs += value.split('{{').length - 1;
+                } else if (component.type === 'BUTTONS') {
+                    for (let button of component.buttons) {
+                        templateInfo.inputs += button.text.split('{{').length - 1;
+                    }
+                }
+            }
+
+            templates.push(templateInfo);
+        }
+        return res.json({ 
+            result: response.data !== undefined, 
+            data: {
+                templates,
+                detail: response.data
+            }
+        });
+    } else {
+        return res.json({ result: false });
+    }
+}
+
+module.exports = { page, crudPage, duplicate, remove, activate, crudFlow, uploadFLowFiles, getWBMsgTemplates };

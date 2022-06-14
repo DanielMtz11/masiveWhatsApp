@@ -12,6 +12,7 @@ block content
                 thead
                     tr 
                         th Name
+                        th Type
                         th Actions
                         th Active
                 tbody 
@@ -24,6 +25,7 @@ block content
                         each trigger in triggers 
                             tr 
                                 td #{trigger.name}
+                                td #{trigger.type.toUpperCase()}
                                 +actions(trigger.id, '/triggers/')
                                 td(style="padding-left: 25px;") 
                                     label.checkbox

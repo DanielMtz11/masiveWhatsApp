@@ -1,8 +1,8 @@
 mixin actions(id = '', baseUrl = '')
     td 
         a.action(href=baseUrl + 'edit/' + id)
-            i.fas.fa-duotone.fa-pen-to-square
+            i.fa.fa-duotone.fa-pen-to-square
         a.action(href=baseUrl + 'duplicate/' + id)
-            i.fas.fa-duotone.fa-copy
+            i.fa.fa-duotone.fa-copy
         a.action(onclick="deleteItem('" + baseUrl + "'," + id + ")")
-            i.fas.fa-duotone.fa-eraser
+            i.fa.fa-duotone.fa-eraser

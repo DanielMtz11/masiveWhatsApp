@@ -1,28 +1,51 @@
-const { WABAClient, WABAErrorAPI } = require("whatsapp-business");
+//const { WABAClient, WABAErrorAPI } = require("whatsapp-business");
+const res = require('express/lib/response');
+const { json } = require('express/lib/response');
+const fetch = require('node-fetch');
 
-const client = new WABAClient({
-    accountId: 100156809383502,//115705297790315,
-    apiToken: 'EAAIbR1eGZBdgBAJu7DAU4ykcApfu85knbX26Erq6jgLtynmBo6hHdUej7i6uhiWFCiBZAOgTDbwZBZCRXGRwuzcD92dC6jhjWZAkNC9TuOjBxDC1f1gYMktB2Q9Noa6ZAAIykZBFKTQq1UC91VPxyfL2LAEZCTKY6esaWgYSvDdTBlSJxKqxwOQJm9IZAQMduf1JG3QUySVdncwZDZD',
-    phoneId: 111578454890042//1418811368578018,
-});
+class WB {
+    authToken = ''
+    phoneNumberID = ''
+    whatsappBusinessID = ''
 
-const foo = async () => {
-	try {
-		const res = await client.getBusinessPhoneNumbers();
-		console.log(res);
-	} catch (err) {
-		console.error(err.message);
-	}
-};
+    constructor({authToken, phoneNumberID, whatsappBusinessID}) {
+        this.authToken = authToken;
+        this.phoneNumberID = phoneNumberID;
+        this.whatsappBusinessID = whatsappBusinessID;
+        this.url = process.env.WB_URL;
+    }
+    
+    async sendTextMessage(phoneNumber, message) {
+        let response = await fetch(this.url + '/' + this.phoneNumberID + '/messages', {
+            method: 'post',
+            body: JSON.stringify({
+                messaging_product: "whatsapp",
+                recipient_type: "individual",
+                to: phoneNumber,
+                type: "text",
+                text: {
+                    "preview_url": false,
+                    "body": message
+                }
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + this.authToken
+            }
+        });
 
-const sendTextMessage = async (body, to) => {
-	try {
-		const res = await client.sendMessage({ type: "text", text: { body }, to });
-		console.log(res);
-	} catch (err) {
-		console.error(err);
-	}
-};
+        return await response.json();
+    }
 
-//foo();
-sendTextMessage("HOLA!!", "573057538309");
+    async getMessageTemplates() {
+        let response = await fetch(this.url + '/' + this.whatsappBusinessID + '/message_templates', {
+            headers: {
+                'Authorization': 'Bearer ' + this.authToken
+            }
+        });
+
+        return await response.json();
+    }
+}
+
+module.exports = WB

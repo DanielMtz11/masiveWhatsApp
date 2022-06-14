@@ -1,27 +1,36 @@
 const Crud = require('../modules/crud');
 
 class Triggers extends Crud {
-    id = -1;
-    name = "";
-    conditions = "";
-    flow = "";
-    step = "";
-    status = "idle";
-    active = 1;
+    id = '';
+    name = '';
+    type = '';
+    active = 0;
+    config = '{}';
+    created = '';
+    conditions = '[]';
 
-    constructor(name, conditions, flow, step, status, active) {
+    constructor({name, conditions, config, type, active, created}) {
         super();
-        this.set({ name, conditions, flow, step, status, active });
+        if (created === undefined) {
+            created = (new Date()).getTime();
+        }
+        this.set({ name, conditions, config, type, active, created });
     }
 
-    set({ name, conditions, flow, step, status, active, id }) {
-        if (name !== undefined) this.name = name;
-        if (conditions !== undefined) this.conditions = conditions;
-        if (flow !== undefined) this.flow = flow;
-        if (step !== undefined) this.step = step;
-        if (status !== undefined) this.status = status;
-        if (active !== undefined) this.active = active;
+    set({ name, conditions, config, type, active, created, id }) {
         if (id !== undefined) this.id = id;
+        if (name !== undefined) this.name = name;
+        if (type !== undefined) this.type = type;
+        if (active !== undefined) this.active = active;
+        if (config !== undefined) {
+            try { config = JSON.parse(config); } catch(err) {}
+            this.config = config;
+        }
+        if (created !== undefined) this.created = created;
+        if (conditions !== undefined) {
+            try { conditions = JSON.parse(conditions); } catch(err) {}
+            this.conditions = conditions;
+        }
     }
 }
 

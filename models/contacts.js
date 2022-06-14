@@ -1,27 +1,31 @@
 const Crud = require('../modules/crud');
 
 class Contact extends Crud {
-    id = -1;
-    firstName = "";
-    lastName = "";
-    email = "";
-    userid = "";
-    sender = "";
-    intent = 0;
+    id = '';
+    email = '';
+    sender = '';
+    intent = '';
+    active = 1;
+    user_id = '';
+    created = '';
+    last_name = '';
+    first_name = '';
 
-    constructor(firstName, lastName, email, userid, sender, intent) {
+    constructor({first_name, last_name, email, user_id, sender, intent, created, active}) {
         super();
-        this.set({ firstName, lastName, email, userid, sender, intent });
+        this.set({ first_name, last_name, email, user_id, sender, intent, created, active });
     }
 
-    set({ firstName, lastName, email, userid, sender, intent, id }) {
-        if (firstName !== undefined) this.firstName = firstName;
-        if (lastName !== undefined) this.lastName = lastName;
+    set({ first_name, last_name, email, user_id, sender, intent, created, active, id }) {
+        if (id !== undefined) this.id = id;
         if (email !== undefined) this.email = email;
-        if (userid !== undefined) this.userid = userid;
         if (sender !== undefined) this.sender = sender;
         if (intent !== undefined) this.intent = intent;
-        if (id !== undefined) this.id = id;
+        if (active !== undefined) this.active = active;
+        if (user_id !== undefined) this.user_id = user_id;
+        if (created !== undefined) this.created = created;
+        if (last_name !== undefined) this.last_name = last_name;
+        if (first_name !== undefined) this.first_name = first_name;
     }
 }
 

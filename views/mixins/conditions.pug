@@ -1,0 +1,31 @@
+mixin conditions(number, condition)
+    .field.is-grouped.condition
+        .control
+            .select 
+                select(name="column[]")
+                    option(value="first_name" selected=(condition.column == "first_name")) First Name 
+                    option(value="last_name" selected=(condition.column == "last_name")) Last Name 
+                    option(value="email" selected=(condition.column == "email")) Email 
+                    option(value="sender" selected=(condition.column == "sender")) Phone Number
+        .control
+            .select 
+                select(name="question[]")
+                    option(value="equals" selected=(condition.question == "equals")) Is Equal To 
+                    option(value="starts" selected=(condition.question == "starts")) Starts With 
+                    option(value="contains" selected=(condition.question == "contains")) Contains 
+                    option(value="ends" selected=(condition.question == "ends")) Ends with 
+        .control
+            input.input(type="text" name="value[]" value=condition.value placeholder="Insert a value") 
+        .control
+            .select 
+                select(name="connector[]")
+                    option(value="and" selected=(condition.connector == "and")) AND
+                    option(value="or" selected=(condition.connector == "or")) OR
+        .control
+            button.button(onclick="addCondition(this.parentElement.parentElement)" form="none")
+                span.icon.is-small
+                    i.fa.fa-plus
+        .control
+            button.button(onclick="deleteCondition(this.parentElement.parentElement)" form="none")
+                span.icon.is-small
+                    i.fa.fa-trash

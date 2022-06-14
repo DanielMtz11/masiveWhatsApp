@@ -10,7 +10,7 @@ html(lang="en")
                 .columns.is-gapless
                     .column.is-3 
                         a.icon.back-button(href="/flows")
-                            i.fas.fa-duotone.fa-angle-left 
+                            i.fa.fa-duotone.fa-angle-left 
                     .column.is-6.has-text-centered
                         h1.title.page-title #{title}
                     .column.is-3.has-text-centered.logo
@@ -24,28 +24,28 @@ html(lang="en")
                         li
                             span &nbsp;Click to add items: 
                         li.fb-item
-                            .box.fb-item-button(onclick="addItem('trigger')") 
+                            .box.fb-item-button(onclick="addItem('trigger')" style="color: cornflowerblue;") 
                                 span.icon-text
                                     span.icon
-                                        i.fas.fa-duotone.fa-rocket 
+                                        i.fa.fa-duotone.fa-rocket 
                                     span &nbsp; Trigger
                         li.fb-item
                             .box.fb-item-button(onclick="addItem('message')") 
                                 span.icon-text
-                                    span.icon
-                                         i.fas.fa-duotone.fa-message
+                                    span.icon(style="color: mediumseagreen;")
+                                         i.fa.fa-duotone.fa-message
                                     span &nbsp; Send a message
                         li.fb-item
                             .box.fb-item-button(onclick="addItem('template')") 
                                 span.icon-text
-                                    span.icon
-                                         i.fas.fa-duotone.fa-comment 
+                                    span.icon(style="color: gold;")
+                                         i.fa.fa-duotone.fa-comment 
                                     span &nbsp; Send a template
                         li.fb-item
                             .box.fb-item-button(onclick="addItem('delay')") 
                                 span.icon-text
-                                    span.icon
-                                         i.fas.fa-duotone.fa-clock
+                                    span.icon(style="color: tomato;")
+                                         i.fa.fa-duotone.fa-clock
                                     span &nbsp; Delay
             .column
                 br

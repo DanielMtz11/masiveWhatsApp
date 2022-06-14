@@ -1,0 +1,68 @@
+include mixins/conditions
+<!DOCTYPE html>
+html(lang="en")
+    head
+        include partials/header
+    body
+        script(src="/dist/js/sweetalert2.all.min.js")
+        section.hero.banner.is-small 
+            .hero-body 
+                .columns.is-gapless
+                    .column.is-3 
+                        a.icon.back-button(href="/triggers")
+                            i.fa.fa-duotone.fa-angle-left 
+                    .column.is-6.has-text-centered
+                        h1.title.page-title #{title}
+                    .column.is-3.has-text-centered.logo
+                        figure.media-right 
+                            img(src="/img/logo.png")
+        .columns
+            .column.is-1
+            .column.is-9
+                br
+                form(method="post" action="/triggers/save") 
+                    input(id="source" type="text" style="opacity: 0; position: absolute;" value=(trigger.config ? trigger.config : {}))
+                    .field
+                        label.label The trigger extracts data from the next source:
+                        .field.is-grouped
+                            .control
+                                .select 
+                                    select(id="type")
+                                        option(value="mysql" selected=(trigger.type == "mysql")) MySQL 
+                                        option(value="excel" selected=(trigger.type == "excel")) Excel 
+                            .control
+                                button.button(onclick="configureSource(this.parentElement.parentElement)" form="none")
+                                    span.icon.is-small
+                                        i.fa.fa-gear
+                    .field
+                        label.label Then, when:
+                        .control
+                            .select 
+                                select(id="when")
+                                    option(value="insert" selected=(trigger.config && trigger.config.when == "insert")) New entry 
+                                    option(value="update" selected=(trigger.config && trigger.config.when == "update")) Edit entry 
+                                    option(value="delete" selected=(trigger.config && trigger.config.when == "delete")) Drop entry 
+                    .field
+                        label.label.conditions-container Ask if:
+                            if trigger.conditions && trigger.conditions.length > 0
+                                each condition, number in trigger.conditions
+                                    +conditions(number, condition)
+                            else 
+                                +conditions(0, {})
+            .column
+                br
+                .columns
+                    .column.is-2.has-text-centered
+                        .columns
+                            .column.has-text-centered
+                                button.button.is-success.is-light(onclick="saveTrigger(this)") Save
+                        .columns
+                            .column.has-text-centered 
+                                a.button(href="/triggers") Cancel
+                        .columns
+                            .column.has-text-centered(onclick="exportTrigger()") 
+                                button.button.is-info.is-light Export
+        script(src="/js/crudTrigger.js") 
+        script.
+            let triggerInfo = !{JSON.stringify(trigger)};
+                

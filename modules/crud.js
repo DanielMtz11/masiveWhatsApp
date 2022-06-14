@@ -10,14 +10,31 @@ class Crud {
     }
 
     async save() {
+        let result = {};
+
         if (this.id !== "") {
-            return await db.update(this);
+            result = await db.update(this);
+        } else {
+            result = await db.insert(this);
         }
-        return await db.insert(this);
+
+        if (result && result.id !== undefined) {
+            this.set(result);
+            return true;
+        }
+
+        return false;
     }
 
     async update() {
-        return await db.update(this);
+        let result = await db.update(this);
+       
+        if (result && result.id !== undefined) {
+            this.set(result);
+            return true;
+        }
+
+        return false;
     }
 
     async remove() {
@@ -52,8 +69,12 @@ class Crud {
         return (await db.all(this, active !== '' ? 'active = ' + active : '')) || [];
     }
 
+    static async query(query) {
+        return (await db.query(query)) || [];
+    }
+
     static async build(data) {
-        let instance = new this(data.name, data.detail, data.created, data.active);
+        let instance = new this(data);
         instance.set({ id: data.id });
         return instance;
     }
