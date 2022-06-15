@@ -2,20 +2,20 @@ const db = require('../db/db');
 
 class Crud {
     async list(active = 1) {
-        return await db.all(this, 'active = ' + active);
+        return db.all(this, 'active = ' + active);
     }
 
     async find(name) {
-        return await db.find(this, 'name = "' + name + '"');
+        return db.find(this, 'name = \'' + name + '\'');
     }
 
     async save() {
         let result = {};
 
         if (this.id !== "") {
-            result = await db.update(this);
+            result = db.update(this);
         } else {
-            result = await db.insert(this);
+            result = db.insert(this);
         }
 
         if (result && result.id !== undefined) {
@@ -27,7 +27,7 @@ class Crud {
     }
 
     async update() {
-        let result = await db.update(this);
+        let result = db.update(this);
        
         if (result && result.id !== undefined) {
             this.set(result);
@@ -38,11 +38,11 @@ class Crud {
     }
 
     async remove() {
-        return await db.remove(this, 'id = ' + this.id);
+        return db.remove(this, 'id = ' + this.id);
     }
 
     static async findById(id) {
-        let data = (await db.find(this, 'id = "' + id + '"')) || {};
+        let data = (db.find(this, 'id = \'' + id + '\'')) || {};
         if (data.id !== undefined) {
             return this.build(data);
         }
@@ -50,7 +50,7 @@ class Crud {
     }
 
     static async find(name) {
-        let data = (await db.find(this, 'name = "' + name + '"')) || {};
+        let data = (db.find(this, 'name = \'' + name + '\'')) || {};
         if (data.id !== undefined) {
             return this.build(data);
         }
@@ -58,7 +58,7 @@ class Crud {
     }
 
     static async findByCondition(condition) {
-        let data = (await db.find(this, condition)) || {};
+        let data = (db.find(this, condition)) || {};
         if (data.id !== undefined) {
             return this.build(data);
         }
@@ -66,11 +66,11 @@ class Crud {
     }
 
     static async list(active = 1) {
-        return (await db.all(this, active !== '' ? 'active = ' + active : '')) || [];
+        return (db.all(this, active !== '' ? 'active = ' + active : '')) || [];
     }
 
     static async query(query) {
-        return (await db.query(query)) || [];
+        return (db.query(query)) || [];
     }
 
     static async build(data) {

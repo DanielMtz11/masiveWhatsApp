@@ -1,4 +1,4 @@
-const sqlite3 = require('sqlite3').verbose();
+const Database = require('better-sqlite3');
 const path = require('path');
 
 class DB {
@@ -9,23 +9,13 @@ class DB {
         this.connect(databasePath);
     }
 
-    async connect(databasePath = '../db/database.db') {
-        return new Promise((resolve, reject) => {
-            this.db = new sqlite3.Database(path.join(__dirname, databasePath), (err) => {
-                if (err) {
-                    console.error(err.message);
-                    return resolve(false);
-                }
-                console.info('Connected to the database.');
-                this.connected = true;
-                resolve(this.db);
-            });
-        });
+    connect(databasePath = '../db/database.db') {
+        this.db = new Database(path.join(__dirname, databasePath), { verbose: console.log });
     }
 
     async initializeScheduler() {
         if (!this.connected) {
-            await this.connect();
+            this.connect();
         }
     
         let configsTable = `CREATE TABLE IF NOT EXISTS 'settings' (
@@ -76,22 +66,17 @@ class DB {
         let promises = [];
         for (let create of [configsTable, flowsTable, triggersTable, contactsTable]) {
             promises.push(new Promise((resolve, reject) => {
-                this.db.run(create, [], (result, err) => {
-                    if (result && result.code) {
-                        console.error('Initialize database', result);
-                        return resolve(false);
-                    }
-                    return resolve(true);
-                });
+                let result = this.db.exec(create);
+                resolve(result);
             }));
         }
     
         return (await Promise.all(promises)).indexOf(false) !== -1;
     }
 
-    async insert(model, tableName = '') {
+    insert(model, tableName = '') {
         if (!this.connected) {
-            await this.connect();
+            this.connect();
         }
     
         let table = tableName !== '' ? tableName : (typeof model === 'function' ? model.name.toLowerCase() : model.constructor.name.toLowerCase());
@@ -115,21 +100,13 @@ class DB {
 
         let insertQuery = `INSERT INTO ${table} (${columns.join(', ')}) VALUES(${insert.join(', ')})`;
         
-        return await new Promise((resolve, reject) => {
-            this.db.run(insertQuery, values, async (result, err) => {
-                if (err) {
-                    console.error('Error inserting', err, model);
-                    return resolve(false);
-                }
-
-                return resolve(await this.find(model, '', 'ORDER BY id DESC LIMIT 1'));
-            });
-        });
+        let result = this.db.prepare(insertQuery).run(values);
+        return this.find(model, 'id = ' + result.lastInsertRowid);
     }
 
-    async update(model, modelValues = '') {
+    update(model, modelValues = '') {
         if (!this.connected) {
-            await this.connect();
+            this.connect();
         }
     
         let table = typeof model === 'function' ? model.name.toLowerCase() : model.constructor.name.toLowerCase();
@@ -151,86 +128,57 @@ class DB {
 
         let updateQuery = `UPDATE ${table} SET ${update.join(', ')} WHERE id = ${model.id}`;
         
-        return await new Promise((resolve, reject) => {
-            this.db.run(updateQuery, values, async (result, err) => {
-                if (err) {
-                    console.error('Error inserting', err, model);
-                    return resolve(false);
-                }
-
-                return resolve(await this.find(model, 'id = ' + (modelValues !== '' ? modelValues : model).id));
-            });
-        });
+        let result = this.db.prepare(updateQuery).run(values);
+        return this.find(model, 'id = ' + (modelValues !== '' ? modelValues : model).id);
     }
 
-    async find(model, condition = '', custom = '') {
+    find(model, condition = '', custom = '') {
+        if (!this.connected) {
+            this.connect();
+        }
+
         let table = (typeof model === 'function' ? model.name.toLowerCase() : model.constructor.name.toLowerCase());
 
         if (condition !== '') {
             condition = ' WHERE ' + condition;
         }
     
-        return await new Promise((resolve, reject) => {
-            this.db.get(`SELECT * FROM ${table}${condition} ${custom}`, [], (err, data) => {
-                if (err || data === undefined) {
-                    console.error('Error trying to find a row', err);
-                    return resolve(false);
-                }
-    
-                return resolve(data);
-            });
-        });
+        return this.db.prepare(`SELECT * FROM ${table}${condition} ${custom}`).get();
     }
 
-    async all(model, condition = '') {
+    all(model, condition = '') {
+        if (!this.connected) {
+            this.connect();
+        }
+
         let table = (typeof model === 'function' ? model.name.toLowerCase() : model.constructor.name.toLowerCase());
 
         if (condition !== '') {
             condition = ' WHERE ' + condition;
         }
 
-        return await new Promise((resolve, reject) => {
-            this.db.all(`SELECT * FROM ${table}${condition}`, [], (err, data) => {
-                if (err || data === undefined) {
-                    console.error('Error trying to get rows', err);
-                    return resolve(false);
-                }
-    
-                return resolve(data);
-            });
-        });
+        return this.db.prepare(`SELECT * FROM ${table}${condition}`).all();
     }
 
-    async remove(model, condition) {
+    remove(model, condition) {
+        if (!this.connected) {
+            this.connect();
+        }
+
         let table = (typeof model === 'function' ? model.name.toLowerCase() : model.constructor.name.toLowerCase());
 
         if (condition !== '') {
             condition = ' WHERE ' + condition;
         }
 
-        return await new Promise((resolve, reject) => {
-            this.db.run(`DELETE FROM ${table}${condition}`, [], (err, data) => {
-                if (err) {
-                    console.error('Error trying to delete ', err);
-                    return resolve(false);
-                }
-    
-                return resolve(true);
-            });
-        });
+        return this.db.prepare(`DELETE FROM ${table}${condition}`).run();
     }
 
-    async query(query) {
-        return await new Promise((resolve, reject) => {
-            this.db.all(query, [], (err, data) => {
-                if (err || data === undefined) {
-                    console.error('Error trying to get rows', err);
-                    return resolve(false);
-                }
-    
-                return resolve(data);
-            });
-        });
+    query(query) {
+        if (!this.connected) {
+            this.connect();
+        }
+        return this.db.exec(query);
     }
 }
 

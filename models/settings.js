@@ -7,23 +7,23 @@ class Settings extends Crud {
     }
 
     async add(name, type, value) {
-        return await db.insert({ name, type, value }, 'settings');
+        return db.insert({ name, type, value }, 'settings');
     }
 
     async modify(name, value) {
-        let setting = await db.find(this, 'name = "' + name + '"');
+        let setting = db.find(this, 'name = \'' + name + '\'');
         if (!this.validate(setting['type'], value)) {
             return false;
         }
 
-        return await db.update(this, {
+        return db.update(this, {
             id: setting['id'],
             value
         }, 'settings');
     }
 
     async get(name) {
-        return await db.find(this, 'name = "' + name + '"');
+        return db.find(this, 'name = \'' + name + '\'');
     }
 
     validate(type, value) {
