@@ -62,9 +62,17 @@ class DB {
             'active' INTEGER,
             PRIMARY KEY('id' AUTOINCREMENT)
         );`;
+
+        let configsInsert = `INSERT INTO settings (name, type, value) 
+            VALUES
+                ('wbi', 'text', '100156809383502'),
+                ('pni', 'text', '111578454890042'),
+                ('token', 'text', 'EAAIbR1eGZBdgBAA5TS5wJCZCvoB43VWr8UR2b9CMj9AN31GVaB7tRZAXUyFrseGYQlzrZBaSDEefa6ctzvoOCtSw4vdDwC0pwFZCDNMsG5PoYovoXufqU45kdAEa4R5ynW6zXMU1ZALxhT1tmJ4GnuxZCmYOwBoeD4lYe6PCLpHt3OJCZAcKKHSS'),
+                ('auth', 'text', 'EAAIbR1eGZBdgBAA5TS5wJCZCvoB43VWr8UR2b9CMj9AN31GVaB7tRZAXUyFrseGYQlzrZBaSDEefa6ctzvoOCtSw4vdDwC0pwFZCDNMsG5PoYovoXufqU45kdAEa4R5ynW6zXMU1ZALxhT1tmJ4GnuxZCmYOwBoeD4lYe6PCLpHt3OJCZAcKKHSS'),
+        `;
     
         let promises = [];
-        for (let create of [configsTable, flowsTable, triggersTable, contactsTable]) {
+        for (let create of [configsTable, flowsTable, triggersTable, contactsTable, configsInsert]) {
             promises.push(new Promise((resolve, reject) => {
                 let result = this.db.exec(create);
                 resolve(result);
