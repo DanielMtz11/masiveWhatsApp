@@ -406,7 +406,7 @@ function addItem(type, id = '', data = '', recovering = false, zIndex = '') {
                     </div>
                     <div class="columns is-grapless is-vcentered has-text-centered">
                         <div class="column flow-item-content">
-                            <input class="input is-danger is-rounded no-spin" type="number" id="${id}-input" style="max-width: 200px;" value="0" min="0" onkeyup="updateDelaySelected(this.parentElement.parentElement.parentElement)" onchange="updateDelaySelected(this.parentElement.parentElement.parentElement)" />
+                            <input class="input is-danger is-rounded no-spin" type="number" id="${id}-input" style="max-width: 200px;" value="${data.value}" min="0" onkeyup="updateDelaySelected(this.parentElement.parentElement.parentElement)" onchange="updateDelaySelected(this.parentElement.parentElement.parentElement)" />
                         </div>
                         <div class="column flow-item-content">
                             <div class="select is-danger is-rounded">
@@ -732,7 +732,7 @@ function updateDelaySelected(item) {
 
     try { data = JSON.parse(decodeURIComponent(item.dataset.data)) } catch(err) {}
 
-    data.value = {
+    data = {
         unit,
         value
     };
