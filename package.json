@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/hm1996/ws-schedule#readme",
   "dependencies": {
+    "@rodrigogs/mysql-events": "^0.6.0",
     "better-sqlite3": "^7.5.3",
     "body-parser": "^1.20.0",
     "connect-flash": "^0.1.1",
@@ -31,6 +32,9 @@
     "passport-local": "^1.0.0",
     "pug": "^3.0.2",
     "sqlite3": "^5.0.8",
-    "whatsapp-business": "^1.2.3"
+    "underscore": "^1.13.4",
+    "winston": "^3.8.1",
+    "winston-daily-rotate-file": "^4.7.1",
+    "zongji": "^0.5.1"
   }
 }

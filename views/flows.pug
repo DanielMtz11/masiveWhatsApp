@@ -22,7 +22,7 @@ block content
                             td
                     else 
                         each flow in flows 
-                            tr 
+                            tr(class=flow.status) 
                                 td #{flow.name}
                                 +actions(flow.id, '/flows/')
                                 td(style="padding-left: 25px;") 

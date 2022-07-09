@@ -66,9 +66,12 @@ async function setJSPlumbInstance() {
     if (responseTemplates.result === true) {
         templates = responseTemplates.data.templates;
     } else {
-        Swal.fire('Error!', 'Error getting the list of templates from Whatsapp Bussines...', 'error');
+        document.getElementById('template-item').disabled = true;
+        document.getElementById('template-item').style.opacity = '0.5';
+        document.getElementById('template-item').style.pointerEvents = 'none';
+        /*Swal.fire('Error!', 'Error getting the list of templates from Whatsapp Bussines...', 'error');
         setTimeout(() => location.href = '/', 2000);
-        return;
+        return;*/
     }
 
     if (flowInfo.id !== undefined) {
@@ -174,13 +177,14 @@ function recoverFlow(details) {
 
 function exportFlow() {
     let details = [];
-    jspInstance.connections.forEach(connection => {
+    let steps = {};
+    for (let connection of jspInstance.connections) {
         let dataSource = {};
         let dataTarget = {};
-
+    
         try { dataSource = JSON.parse(decodeURIComponent(connection.source.dataset.data)); } catch(err) { dataSource = {} }
         try { dataTarget = JSON.parse(decodeURIComponent(connection.target.dataset.data)); } catch(err) { dataTarget = {} }
-
+    
         let source = {
             id: connection.source.id,
             uuid: connection.endpoints[0].uuid,
@@ -197,10 +201,25 @@ function exportFlow() {
             type: connection.target.dataset.type,
             data: dataTarget,
         };
-        details.push({source, target});
-    });
 
-    return details;
+        if (steps[connection.source.id] === undefined) {
+            steps[connection.source.id] = {
+                type: source.type,
+                data: source.data
+            };
+        }
+
+        if (steps[connection.target.id] === undefined) {
+            steps[connection.target.id] = {
+                type: target.type,
+                data: target.data
+            };
+        }
+
+        details.push({source, target});
+    }
+
+    return { steps: Object.values(steps), detail: details };
 }
 
 function addItem(type, id = '', data = '', recovering = false, zIndex = '') {
@@ -724,6 +743,12 @@ function updateTriggerSelected(select, flowItem) {
     flowItem.setAttribute('data-data', encodeURIComponent(JSON.stringify({
         trigger: select.value
     })));
+
+    if (select.value === '') {
+        flowItem.querySelector('.button.is-warning').disabled = true;
+    } else {
+        flowItem.querySelector('.button.is-warning').disabled = false;
+    }
 }
 
 function updateDelaySelected(item) {
@@ -752,7 +777,7 @@ function saveFlow(elem) {
     let flowData = {};
     try { flowData = JSON.parse(decodeURIComponent(flowItem.dataset.data)) } catch(err) {}
     
-    let flowDetails = exportFlow();
+    let { steps, detail } = exportFlow();
     if (flowData.trigger === undefined) {
         elem.classList.remove('is-loading');
         return Swal.fire('Error!', 'You need to have a trigger selected for the flow', 'error');
@@ -777,7 +802,8 @@ function saveFlow(elem) {
             let response = await fetch('/flows/' + url, {
                 body: JSON.stringify({
                     name: flowName,
-                    detail: JSON.stringify(flowDetails),
+                    detail: JSON.stringify(detail),
+                    steps: JSON.stringify(steps),
                     trigger: flowData.trigger
                 }),
                 method: 'post',

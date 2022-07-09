@@ -23,7 +23,7 @@ block content
                             td 
                     else 
                         each trigger in triggers 
-                            tr 
+                            tr(class=(trigger.error && trigger.error != '' ? 'error' : '') title=trigger.error)
                                 td #{trigger.name}
                                 td #{trigger.type.toUpperCase()}
                                 +actions(trigger.id, '/triggers/')

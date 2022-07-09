@@ -1,4 +1,5 @@
 const Triggers = require('../models/triggers');
+const { testConnection } = require('../modules/jobs');
 
 const page = async (req, res) => {
     let triggers = await Triggers.list('') || [];
@@ -32,6 +33,11 @@ async function crudTrigger(req, res) {
     let id = req.params.id;
     let { name, conditions, config, type } = req.body;
 
+    let isConfigOk = await testConnection(config);
+    if (!isConfigOk.result) {
+        return res.json({ result: false, error: 'connection', detail: isConfigOk.detail });
+    }
+
     if (name === undefined || conditions === undefined || config === undefined || type === undefined) {
         return res.json({ result: false });
     }
@@ -39,7 +45,7 @@ async function crudTrigger(req, res) {
     let trigger = {};
     if (id !== undefined) {
         trigger = await Triggers.findById(id);
-        trigger.set({name, conditions, config, type, active: 0});
+        trigger.set({name, conditions, config, type, active: 0, error: ''});
     } else {
         trigger = new Triggers({name, conditions, config, type, active: 0});
     }

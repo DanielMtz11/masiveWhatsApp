@@ -10,7 +10,7 @@ class DB {
     }
 
     connect(databasePath = '../db/database.db') {
-        this.db = new Database(path.join(__dirname, databasePath), { verbose: console.log });
+        this.db = new Database(path.join(__dirname, databasePath));
     }
 
     async initializeScheduler() {
@@ -31,6 +31,7 @@ class DB {
             'name' TEXT,
             'trigger' INTEGER,
             'step' INTEGER,
+            'steps' TEXT,
             'detail' TEXT,
             'created' TEXT,
             'status' TEXT,
@@ -47,6 +48,7 @@ class DB {
             'type' TEXT,
             'created' TEXT,
             'active' INTEGER,
+            'error' TEXT,
             PRIMARY KEY('id' AUTOINCREMENT)
         );`;
         // funnel_step_id, nombre, apellido, email, userid, sender, intent
@@ -62,17 +64,9 @@ class DB {
             'active' INTEGER,
             PRIMARY KEY('id' AUTOINCREMENT)
         );`;
-
-        let configsInsert = `INSERT INTO settings (name, type, value) 
-            VALUES
-                ('wbi', 'text', '100156809383502'),
-                ('pni', 'text', '111578454890042'),
-                ('token', 'text', 'EAAIbR1eGZBdgBAA5TS5wJCZCvoB43VWr8UR2b9CMj9AN31GVaB7tRZAXUyFrseGYQlzrZBaSDEefa6ctzvoOCtSw4vdDwC0pwFZCDNMsG5PoYovoXufqU45kdAEa4R5ynW6zXMU1ZALxhT1tmJ4GnuxZCmYOwBoeD4lYe6PCLpHt3OJCZAcKKHSS'),
-                ('auth', 'text', 'EAAIbR1eGZBdgBAA5TS5wJCZCvoB43VWr8UR2b9CMj9AN31GVaB7tRZAXUyFrseGYQlzrZBaSDEefa6ctzvoOCtSw4vdDwC0pwFZCDNMsG5PoYovoXufqU45kdAEa4R5ynW6zXMU1ZALxhT1tmJ4GnuxZCmYOwBoeD4lYe6PCLpHt3OJCZAcKKHSS'),
-        `;
     
         let promises = [];
-        for (let create of [configsTable, flowsTable, triggersTable, contactsTable, configsInsert]) {
+        for (let create of [configsTable, flowsTable, triggersTable, contactsTable]) {
             promises.push(new Promise((resolve, reject) => {
                 let result = this.db.exec(create);
                 resolve(result);
@@ -121,23 +115,24 @@ class DB {
         let update = [];
         let values = [];
 
-        for (let column in (modelValues !== '' ? modelValues : model)) {
+        let updateValues = (modelValues !== '' ? modelValues : model)
+        for (let column in updateValues) {
             if (['id', 'db', 'settings'].includes(column)) continue;
 
             update.push(column + ' = ?');
             let value = '';
-            if (typeof model[column] === 'object') {
-                try { value = JSON.stringify(model[column]) } catch(err) {}
+            if (typeof updateValues[column] === 'object') {
+                try { value = JSON.stringify(updateValues[column]) } catch(err) {}
             } else {
-                value = model[column];
+                value = updateValues[column];
             }
             values.push(value);
         }
 
-        let updateQuery = `UPDATE ${table} SET ${update.join(', ')} WHERE id = ${model.id}`;
+        let updateQuery = `UPDATE ${table} SET ${update.join(', ')} WHERE id = ${updateValues.id}`;
         
         let result = this.db.prepare(updateQuery).run(values);
-        return this.find(model, 'id = ' + (modelValues !== '' ? modelValues : model).id);
+        return this.find(model, 'id = ' + updateValues.id);
     }
 
     find(model, condition = '', custom = '') {

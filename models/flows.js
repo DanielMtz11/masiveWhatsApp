@@ -4,31 +4,38 @@ class Flows extends Crud {
     id = '';
     name = '';
     step = '';
+    steps = '[]';
     detail = '{}';
-    status = '{}'
+    status = 'idle'
     active = 1;
     trigger = '';
     created = '';
 
-    constructor({name, trigger, step, detail, created, status, active}) {
+    constructor({name, trigger, step, steps, detail, created, status, active}) {
         super();
         if (created === undefined) {
             created = (new Date()).getTime();
         }
 
-        this.set({ name, trigger, step, detail, created, status, active });
+        this.set({ name, trigger, step, steps, detail, created, status, active });
     }
     
-    set({ name, trigger, step, detail, created, status, active, id }) {
+    set({ name, trigger, step, steps, detail, created, status, active, id }) {
         if (id !== undefined) this.id = id;
         if (name !== undefined) this.name = name;
-        if (step !== undefined) this.step = step;
+        if (step !== undefined) {
+            try { step = JSON.parse(step); } catch(err) {}
+            this.step = step;
+        }
+        if (steps !== undefined) {
+            try { steps = JSON.parse(steps); } catch(err) {}
+            this.steps = steps;
+        }
         if (detail !== undefined) {
             try { detail = JSON.parse(detail); } catch(err) {}
             this.detail = detail;
         }
         if (status !== undefined) {
-            try { status = JSON.parse(status); } catch(err) {}
             this.status = status;
         }
         if (active !== undefined) this.active = active;

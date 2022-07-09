@@ -7,7 +7,7 @@ async function addCondition(elem) {
 
 async function deleteCondition(elem) {
     let conditions = Array.from(document.querySelectorAll('.condition'));
-    if (conditions.length == 1) return;
+    // if (conditions.length == 1) return;
     elem.remove();
 }
 
@@ -113,6 +113,9 @@ function saveTrigger(elem) {
                 response = await response.json();
     
                 if (!response.result) {
+                    if (response.error === 'connection') {
+                        throw new Error('Verify your connection configs! - ' + JSON.stringify(response.detail));
+                    }
                     throw new Error('Can not save or update!');
                 }
 

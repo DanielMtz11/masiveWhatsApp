@@ -69,6 +69,10 @@ class Crud {
         return (db.all(this, active !== '' ? 'active = ' + active : '')) || [];
     }
 
+    static async listByCondition(condition = '') {
+        return (db.all(this, condition)) || [];
+    }
+
     static async query(query) {
         return (db.query(query)) || [];
     }

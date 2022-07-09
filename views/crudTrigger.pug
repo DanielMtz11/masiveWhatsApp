@@ -48,7 +48,11 @@ html(lang="en")
                                 each condition, number in trigger.conditions
                                     +conditions(number, condition)
                             else 
-                                +conditions(0, {})
+                                .field.is-grouped.condition
+                                    .control
+                                        button.button(onclick="addCondition(this.parentElement.parentElement);this.parentElement.parentElement.remove()" form="none")
+                                            span.icon.is-small
+                                                i.fa.fa-plus
             .column
                 br
                 .columns

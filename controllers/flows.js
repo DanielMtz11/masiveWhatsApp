@@ -33,7 +33,7 @@ async function crudPage(req, res) {
 
 async function crudFlow(req, res) {
     let id = req.params.id;
-    let { name, trigger, detail } = req.body;
+    let { name, trigger, detail, steps } = req.body;
 
     if (name === undefined || detail === undefined) {
         return res.json({ result: false });
@@ -42,9 +42,9 @@ async function crudFlow(req, res) {
     let flow = {};
     if (id !== undefined) {
         flow = await Flows.findById(id);
-        flow.set({name, detail, trigger, status: '{}', step: '', active: 0});
+        flow.set({name, detail, steps, trigger, status: 'idle', step: '', active: 0});
     } else {
-        flow = new Flows({name, trigger, detail, active: 0});
+        flow = new Flows({name, trigger, detail, steps, active: 0});
     }
 
     let result = await flow.save();
@@ -61,7 +61,7 @@ async function duplicate(req, res) {
     flow.set({
         name: baseName + ' - duplicated(' + (sameName.length) + ')',
         active: 0,
-        status: '{}',
+        status: 'idle',
         step: '',
         id: ""
     });
@@ -87,7 +87,7 @@ async function activate(req, res) {
     let flow = await Flows.findById(id);
     if (!flow) res.redirect('/flows');
 
-    flow.set({ active: req.query.active, status: '{}', step: ''});
+    flow.set({ active: req.query.active, status: 'idle', step: ''});
 
     let result = await flow.save();
     res.json({ result });
