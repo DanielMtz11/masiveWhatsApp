@@ -14,7 +14,7 @@ const testConnection = async config => {
 
     let instance = new MySQLEvents({
         host,//'147.185.238.85',
-        user: 'ws-scheduler',
+        user: process.env.DATABASE_USER,
         password,
     }, {
         startAtEnd: true,
@@ -210,7 +210,7 @@ const initializeEventTrigger = async trigger => {
                 let lastErrrorCount = connections[trigger.name] ? connections[trigger.name].errors || 0 : 0;
                 connections[trigger.name] = new MySQLEvents({
                     host,//'147.185.238.85',
-                    user: 'ws-scheduler',
+                    user: process.env.DATABASE_USER,
                     password,
                 }, {
                     startAtEnd: true,
