@@ -16,7 +16,6 @@ async function setJSPlumbInstance() {
 
     jspInstance.batch(() => {
         jspInstance.bind('connection', (info, event) => {
-            //info.targetEndpoint.endpoint.setVisible(false);
             info.connection.connector.canvas.style.zIndex = Math.min(...[Number(info.source.style.zIndex), Number(info.target.style.zIndex)]) + 1;
             console.log(info, event);
         });
@@ -375,14 +374,17 @@ function addItem(type, id = '', data = '', recovering = false, zIndex = '') {
             break;
         case 'template':
             let values = ''
+            let filePathSelected = '';
+            templateSelected = '';
             if (typeof data !== 'string') {
-                selected = data.template;
-                values = data.values.join(',');
+                templateSelected = data.template.id;
+                filePathSelected = (data.template.components.header && typeof data.template.components.header.value == 'string') ? data.template.components.header.value : '';
+                values = [...((data.template.components.header && typeof data.template.components.header.value == 'string') ? [] : data.template.components.header.value), ...data.template.components.body.value].join(',');
             }
-            optionsTemplate = templates.map(item => `<option value="${item.id}" ${selected == item.id ? 'selected' : '' }>${item.name} - ${item.language}</option>`).join('');
+            optionsTemplate = templates.map(item => `<option value="${item.id}" ${templateSelected == item.id ? 'selected' : '' }>${item.name} - ${item.language}</option>`).join('');
 
             itemHTML += `
-                <div class="flow-item" id="${id}" style="z-index: ${zIndex}; width: 250px; background: white; background: linear-gradient(0, white 80%, white 80%, gold 80%, gold 100%);" data-type="${type}" data-data="${encodeURIComponent(dataJSON)}">
+                <div class="flow-item" id="${id}" style="z-index: ${zIndex}; width: 250px; background: white; background: linear-gradient(0, white 82%, white 82%, gold 82%, gold 100%);" data-type="${type}" data-data="${encodeURIComponent(dataJSON)}">
                     <i class="fa fa-duotone fa-xmark" style="color: white; cursor: pointer; position: absolute;position: absolute; top: 6px; right: 6px;" onclick="removeItem(this.parentElement)"></i>
                     <i class="fa fa-duotone fa-eye" style="display: block;color: gray; cursor: pointer; position: absolute; top: 45px; right: 5px; z-index: 0; font-size: 12px;" onclick="previewTemplate(this.parentElement, this)"></i>
                     <div class="columns is-grapless" style="height: 35px;">
@@ -400,6 +402,23 @@ function addItem(type, id = '', data = '', recovering = false, zIndex = '') {
                                     <option value="">Select a template</option>
                                     ${optionsTemplate}
                                 </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="columns is-grapless is-vcentered has-text-centered template-file-container" style="display: none;">
+                        <div class="column has-text-centered">
+                            <div class="file is-small is-warning">
+                                <label class="file-label">
+                                    <input class="file-input" data-parent="${id}" type="file" id=${id + '-template-file'} accept="" onchange="fileSelected(this);" value="">
+                                    <span class="file-cta">
+                                        <span class="file-icon">
+                                            <i class="fa fa-upload"></i>
+                                        </span>
+                                        <span class="file-label">
+                                            ${filePathSelected}
+                                        </span>
+                                    </span>
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -430,12 +449,12 @@ function addItem(type, id = '', data = '', recovering = false, zIndex = '') {
                         <div class="column flow-item-content">
                             <div class="select is-danger is-rounded">
                                 <select id="${id}-select" style="max-width: 200px;" onchange="updateDelaySelected(this.parentElement.parentElement.parentElement.parentElement)">
-                                    <option value="seconds">Seconds</option>
-                                    <option value="minutes">Minutes</option>
-                                    <option value="hours">Hours</option>
-                                    <option value="days">Days</option>
-                                    <option value="weeks">Weeks</option>
-                                    <option value="months">Months</option>
+                                    <option value="seconds" ${data.unit == 'seconds' ? 'selected' : ''}>Seconds</option>
+                                    <option value="minutes" ${data.unit == 'minutes' ? 'selected' : ''}>Minutes</option>
+                                    <option value="hours" ${data.unit == 'hours' ? 'selected' : ''}>Hours</option>
+                                    <option value="days" ${data.unit == 'days' ? 'selected' : ''}>Days</option>
+                                    <option value="weeks" ${data.unit == 'weeks' ? 'selected' : ''}>Weeks</option>
+                                    <option value="months" ${data.unit == 'months' ? 'selected' : ''}>Months</option>
                                 </select>
                             </div>
                         </div>
@@ -452,6 +471,10 @@ function addItem(type, id = '', data = '', recovering = false, zIndex = '') {
 
     canvas.insertAdjacentHTML('beforeend', itemHTML);
     addEndpointsToItems('#' + id);
+    
+    if (type == 'template') {
+        updateTemplateSelected(document.getElementById(id), document.getElementById(id + '-select'), true);
+    }
 
     if (!recovering) {
         setTimeout(() => {
@@ -468,11 +491,11 @@ function previewTemplate(item, elem) {
 
     if (!template) return;
 
-    let actualValues = item.querySelector('input').value.split(',').map(v => v.trim());
+    let actualValues = item.querySelector('input[type="text"]').value.split(',').map(v => v.trim());
 
     let components = {};
     for (let type in template.components) {
-        components[type] = template.components[type];
+        components[type] = template.components[type].format == 'text' ? template.components[type].template : template.components[type].format;
         for (let i = 1; i <= template.inputs; i++) {
             components[type] = components[type].split('{{' + i + '}}').join('<span style="color: gold">' + (actualValues[i - 1] ? actualValues[i - 1] : '{{' + i + '}}') + '</span>');
         }
@@ -485,7 +508,6 @@ function previewTemplate(item, elem) {
         IMAGE: 'fa-image,'
     }
     if (components.header) {
-        components.header
         html.push(`<h3>Header</h3>
                     <p>${icon[components.header] ? '<i style="font-size:30px;" class="fa-solid ' + icon[components.header] + '"></i>&nbsp' : formatWhatsappText(components.header)}</p>`);
     }
@@ -498,9 +520,6 @@ function previewTemplate(item, elem) {
                 <p>${formatWhatsappText(components.footer)}</p>`);
     }
 
-    console.log(template);
-
-
     Swal.fire({
         title: '<strong>Preview</strong>',
         html: '<div class="content is-small">' + html.join('') + '</div>',
@@ -510,8 +529,22 @@ function previewTemplate(item, elem) {
     });
 }
 
-function updateTemplateSelected(item, elem) {
+function updateTemplateSelected(item, elem, force = false) {
+    if (elem.value === '') return;
+
     let template = templates.find(t => t.id == elem.value);
+
+    let { header, body } = template.components;
+
+    if (['DOCUMENT', 'VIDEO', 'IMAGE'].includes(header ? header.format : '')) {
+        item.querySelector('.template-file-container').style.display = 'block';
+        item.querySelector('.file-input').setAttribute('accept', (header.format != 'DOCUMENT' ? (header.format.toLowerCase() + '/*') : ''));
+        if (!force) item.querySelector('.file-label .file-label').innerHTML = 'Choose the ' + header.format.toLowerCase() + ' header...';
+        item.querySelector('.file-icon').innerHTML = '<i class="fa fa-' + (header.format != 'DOCUMENT' ? header.format.toLowerCase() : 'file') + '"></i>';
+    } else {
+        item.querySelector('.template-file-container').style.display = 'none';
+        item.querySelector('.file-input').value = ""
+    }
 
     if (template && template.inputs > 0) {
         let actualValues = item.querySelector('input').value.split(',').map(v => v.trim());
@@ -529,34 +562,47 @@ function updateTemplateSelected(item, elem) {
         item.querySelector('input').disabled = true;
     }
 
-    item.setAttribute('data-data', encodeURIComponent(JSON.stringify({
-        template: elem.value
-    })));
+    if (!force) {
+        item.setAttribute('data-data', encodeURIComponent(JSON.stringify({
+            template,
+            type: 'template'
+        })));
+    }
+
+    maskInputs(item, item.querySelector('input[type=text]'));
 }
 
 function maskInputs(item, elem) {
-    let template = templates.find(t => t.id == item.querySelector('select').value);
+    let data = {};
+    try { data = JSON.parse(decodeURIComponent(item.dataset.data)); } catch(err) {}
 
-    
-    if (template) {
-        let data = {};
-        try { data = JSON.parse(decodeURIComponent(item.dataset.data)); } catch(err) {}
-    
+    if (data.template) {
+        let { header, body } = data.template.components;
+
         let actualValues = elem.value.split(',').map(v => v.trim());
-        data.values = actualValues;
-
-        item.setAttribute('data-data', encodeURIComponent(JSON.stringify(data)));
-        if (actualValues.length > template.inputs) {
+        if (actualValues.length > data.template.inputs) {
             elem.style.opacity = 0.7;
-            actualValues.splice(template.inputs);
+            actualValues.splice(data.template.inputs);
             elem.value = actualValues.join(',');
-        } else if (actualValues.length == template.inputs) {
+        } else if (actualValues.length == data.template.inputs) {
             elem.style.opacity = 0.7;
             elem.value = actualValues.join(',');
         } else {
             elem.style.opacity = 1;
             elem.value = actualValues.join(',');
         }
+        
+        let values = elem.value.split(',');
+        if (header && header.format.toUpperCase() == 'TEXT') {
+            let count = Math.min(header.template.split('{{').length - 1, header.template.split('}}').length - 1);
+            data.template.components.header.value = values.splice(0, count);
+        }
+        if (body.format.toUpperCase() == 'TEXT') {
+            let count = Math.min(body.template.split('{{').length - 1, body.template.split('}}').length - 1);
+            data.template.components.body.value = values.splice(0, count);
+        }
+        
+        item.setAttribute('data-data', encodeURIComponent(JSON.stringify(data)));
     }
 }
 
@@ -688,6 +734,7 @@ function updateTextAreaData(elem){
     try { data = JSON.parse(decodeURIComponent(elem.dataset.data)) } catch(err) {}
 
     data.value = text;
+    data.type = 'text';
 
     item.setAttribute('data-data', encodeURIComponent(JSON.stringify(data)));   
 }
@@ -821,7 +868,7 @@ function saveFlow(elem) {
 
                 if (flowInfo.detail) {
                     let files = flowInfo.detail.filter(item => {
-                        let typeFiles = ['image', 'video', 'file', 'audio'];
+                        let typeFiles = ['image', 'video', 'file', 'audio', 'template'];
                         return (typeFiles.includes(item.source.data.type) || typeFiles.includes(item.target.data.type)) 
                     });
 
@@ -835,12 +882,12 @@ function saveFlow(elem) {
                         promises: []
                     };
                     for (let file of files) {
-                        if (['image', 'video', 'file', 'audio'].includes(file.source.data.type) && !uploadeds.includes(file.source.data.value)) {
+                        if (['image', 'video', 'file', 'audio', 'template'].includes(file.source.data.type) && !uploadeds.includes(file.source.data.value)) {
                             uploadeds.push(file.source.data.value);
                             promises.promises.push(uploadFile(document.getElementById(file.source.id)));
                         }
                         
-                        if (['image', 'video', 'file', 'audio'].includes(file.target.data.type) && !uploadeds.includes(file.target.data.value)) {
+                        if (['image', 'video', 'file', 'audio', 'template'].includes(file.target.data.type) && !uploadeds.includes(file.target.data.value)) {
                             uploadeds.push(file.target.data.value);
                             promises.promises.push(uploadFile(document.getElementById(file.target.id)));
                         }
@@ -882,7 +929,9 @@ function saveFlow(elem) {
 }
 
 async function uploadFile(item) {
-    const formData     = new FormData();
+    const formData = new FormData();
+    if (item.querySelector('.file-input').files.length == 0) return;
+    
     formData.append('file', item.querySelector('.file-input').files[0]);
     let response = await fetch('/flows/file/upload/' + flowInfo.id, {
         method: 'post',
@@ -899,7 +948,13 @@ function fileSelected(elem, type) {
     let item = document.getElementById(elem.dataset.parent);
     let data = {};
     try { data = JSON.parse(decodeURIComponent(item.dataset.data)) } catch(err) {}
-    data.value = file.name;
+    if (item.dataset.type !== 'template') {
+        data.value = file.name;
+        item.querySelector('.file-name').textContent = elem.files[0].name;
+    } else {
+        item.querySelector('.file-label .file-label').textContent = elem.files[0].name;
+        data.template.components.header.value = file.name;
+    }
     item.setAttribute('data-data', encodeURIComponent(JSON.stringify(data)));
 
     if (flowInfo.id) {
@@ -912,7 +967,6 @@ function fileSelected(elem, type) {
             });
     }
 
-    item.querySelector('.file-name').textContent = elem.files[0].name;
     const reader = new FileReader();
     reader.addEventListener('load', function () {
         // convert image file to base64 string
@@ -923,4 +977,3 @@ function fileSelected(elem, type) {
     }, false);
     reader.readAsDataURL(file);
 }
-

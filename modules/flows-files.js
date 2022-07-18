@@ -1,6 +1,7 @@
-let fs = require('fs');
-let path = require('path');
-let Flows = require('../models/flows');
+const fs = require('fs');
+const path = require('path');
+const logger = require('./logger');
+const Flows = require('../models/flows');
 
 module.exports.checkFlowsFiles = async () => {
     let flows = await Flows.list('');
@@ -22,7 +23,7 @@ module.exports.deleteFlowFiles = (flowID) => {
     if (fs.existsSync(folderPath)) {
         let files = fs.readdirSync(folderPath);
         for (const file of files) {
-            console.log(file + ': File Deleted Successfully.');
+            logger.info(file + ': File Deleted Successfully.');
             fs.unlinkSync(path.join(folderPath, file));
         }
         fs.rmdirSync(folderPath);

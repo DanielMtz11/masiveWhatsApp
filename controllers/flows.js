@@ -137,6 +137,7 @@ async function getWBMsgTemplates(req, res) {
             if (template.status !== 'APPROVED') continue;
 
             templateInfo = {
+                code: template.name,
                 id: template.id,
                 language: template.language,
                 name: template.name.split('_').map(item => item.toUpperCase()).join(' '),
@@ -149,13 +150,17 @@ async function getWBMsgTemplates(req, res) {
                 let value = undefined;
                 if (component.type === 'BUTTONS') {
                     value = component.buttons;
-                } else if (component. format === 'TEXT' || component.format === undefined) {
+                } else if (component.format === 'TEXT' || component.format === undefined) {
                     value = component.text;
                 } else if (component.format !== '') {
-                    value = component.format;
+                    value = '';
                 }
 
-                templateInfo.components[component.type.toLowerCase()] = value;
+                templateInfo.components[component.type.toLowerCase()] = {
+                    format: component.format ?? 'TEXT',
+                    template: value,
+                    value: []
+                };
                 
                 if (typeof value === 'string') {
                     templateInfo.inputs += value.split('{{').length - 1;

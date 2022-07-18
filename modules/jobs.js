@@ -60,31 +60,35 @@ const getNewDelayDate = (data) => {
 }
 
 const executeStep = async (flow, step, data) => {
-    logger.info('Flow', flow.id, 'Step', step.id, 'is a', step.type);
+    logger.info('Executing', flow.id + '.' + step.id, '(' + step.type + ')');
+    let settings = new Settings();
+    let wbi = await settings.get('wbi');
+    let pni = await settings.get('pni');
+    let auth = await settings.get('auth');
+
+    let wb = new WB({ 
+        authToken: auth.value, 
+        phoneNumberID: pni.value, 
+        whatsappBusinessID: wbi.value
+    });
+    let response = {};
+
     switch(step.type) {
         case 'message':
-            logger.info('Starting step', flow.id + '.' + step.id, 'sending a message');
+            logger.info('Starting', flow.id + '.' + step.id, 'sending a message', step.data.type);
             
-            let settings = new Settings();
-            let wbi = await settings.get('wbi');
-            let pni = await settings.get('pni');
-            let auth = await settings.get('auth');
-        
-            let wb = new WB({ 
-                authToken: auth.value, 
-                phoneNumberID: pni.value, 
-                whatsappBusinessID: wbi.value
-            });
-            
-            let response = await wb.sendTextMessage(data.sender, step.data.value);
+            response = await wb.sendMessage(data.sender, step.data.value, step.data.type, flow);
             logger.info('Sending message response:', response);
             break;
         case 'template':
-            logger.info('Starting step', flow.id + '.' + step.id, 'sending a template');
+            logger.info('Starting', flow.id + '.' + step.id, 'sending a template');
+            
+            response = await wb.sendMessageTemplate(data.sender, step.data.template, flow);
+            logger.info('Sending template response:', response);
             break;
         case 'delay':
             date = getNewDelayDate(step.data)
-            logger.info('Starting step', flow.id + '.' + step.id, 'waiting until', date.toString());
+            logger.info('Delay', flow.id + '.' + step.id, 'waiting until', date.toString());
             ns.scheduleJob(date, function(flowJob, stepJob, dataJob) {
                 logger.info('Waiting step', flowJob.id + '.' + stepJob.id, 'finished');
                 executeFlow(flowJob, dataJob);
@@ -113,8 +117,6 @@ const executeFlow = async (flow, data) => {
         let step = steps[id];
         if (step.type === 'trigger' || step.executed === true) continue;
 
-
-        logger.info('Executing Step', id, 'Of Flow', flow.id);
         flow.step = {
             start: (new Date()).getTime(),
             id, 
@@ -262,15 +264,15 @@ const initializeEventTrigger = async trigger => {
                 delete connections[trigger.name];
             });
         } catch (err) {
-            logger.error('Trigger', trigger.id, 'Connection FAIL', err);
-            if (connections[trigger.name].errors === 5) {
+            connections[trigger.name].errors += 1;
+            if (connections[trigger.name].errors > 5) {
                 trigger.error = JSON.stringify(err);
                 await trigger.update();
                 connections[trigger.name].failTime = (new Date()).getTime();
+                connections[trigger.name].errors = 0;
             }
-
-            connections[trigger.name].errors += 1;
-            logger.info('ERROR', trigger.name, err);
+            logger.error('Trigger', trigger.id, 'Connection FAIL', err);
+            logger.error('ERROR', trigger.name, err);
         }
     }
 }
