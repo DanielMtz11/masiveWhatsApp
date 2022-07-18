@@ -378,7 +378,7 @@ function addItem(type, id = '', data = '', recovering = false, zIndex = '') {
             templateSelected = '';
             if (typeof data !== 'string') {
                 templateSelected = data.template.id;
-                filePathSelected = (data.template.components.header && typeof data.template.components.header.value == 'string') ? data.template.components.header.value : '';
+                filePathSelected = (data.template && data.template.components && data.template.components.header && typeof data.template.components.header.value == 'string') ? data.template.components.header.value : '';
                 values = [...((data.template.components.header && typeof data.template.components.header.value == 'string') ? [] : data.template.components.header.value), ...data.template.components.body.value].join(',');
             }
             optionsTemplate = templates.map(item => `<option value="${item.id}" ${templateSelected == item.id ? 'selected' : '' }>${item.name} - ${item.language}</option>`).join('');
