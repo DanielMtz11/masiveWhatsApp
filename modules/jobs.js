@@ -13,7 +13,8 @@ const testConnection = async config => {
     let password = config.pass;
 
     let instance = new MySQLEvents({
-        host,//'147.185.238.85',
+        host: host.split(':')[0],
+        port: host.split(':')[1],
         user: process.env.DATABASE_USER,
         password,
     }, {
@@ -209,7 +210,8 @@ const initializeEventTrigger = async trigger => {
             if (!connections[trigger.name] || connections[trigger.name].connection.state !== 'authenticated') {
                 let lastErrrorCount = connections[trigger.name] ? connections[trigger.name].errors || 0 : 0;
                 connections[trigger.name] = new MySQLEvents({
-                    host,//'147.185.238.85',
+                    host: host.split(':')[0],
+                    port: host.split(':')[1],
                     user: process.env.DATABASE_USER,
                     password,
                 }, {
