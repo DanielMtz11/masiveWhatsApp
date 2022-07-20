@@ -226,47 +226,45 @@ const initializeEventTrigger = async trigger => {
                 logger.info('Testing Trigger', trigger.id, 'Connection OK');
 
                 connections[trigger.name].errors = 0;
-
-                connections[trigger.name].on(MySQLEvents.EVENTS.CONNECTION_ERROR, (err) => {
-                    logger.error('CONN ERROR', trigger.name, err);
-                    try { connections[trigger.name].stop() } catch(err) {}
-                    delete connections[trigger.name];
-                });
-                
-                connections[trigger.name].on(MySQLEvents.EVENTS.ZONGJI_ERROR, (err) => {
-                    logger.error('ZONGJI ERROR', trigger.name, err);
-                    try { connections[trigger.name].stop() } catch(err) {}
-                    delete connections[trigger.name];
-                });
             }
-            
+
             try {
                 connections[trigger.name].removeTrigger({
                     name: Object.keys(Object.values(connections[trigger.name].expressions).pop().statements).pop(),
                     expression: Object.keys(connections[trigger.name].expressions).pop(),
                     statement: Object.keys(Object.values(connections[trigger.name].expressions).pop().statements).pop()
                 });
-
-                connections[trigger.name].addTrigger({
-                    name: trigger.config.when.toUpperCase(),
-                    expression: database + '.' + table,
-                    statement: event,
-                    onEvent: async function (triggerEvent, event) {
-                        logger.info('Mysql Event', event.type);
-                        let id = triggerEvent.id;
-                        let localTrigger = await Triggers.findById(id);
-                        let row = event.affectedRows[0].after;
-                        if (event.type === 'DELETE') {
-                            row = event.affectedRows[0].before;
-                        }
-    
-                        let result = validateConditions(row, localTrigger.conditions);
-                        if (result) {
-                            executeFlowsTrigger(id, row);
-                        }
-                    }.bind(null, trigger)
-                });
             } catch (err) {}
+
+            connections[trigger.name].addTrigger({
+                name: trigger.config.when.toUpperCase(),
+                expression: database + '.' + table,
+                statement: event,
+                onEvent: async function (triggerEvent, event) {
+                    logger.info('Mysql Event', event.type);
+                    let id = triggerEvent.id;
+                    let localTrigger = await Triggers.findById(id);
+                    let row = event.affectedRows[0].after;
+                    if (event.type === 'DELETE') {
+                        row = event.affectedRows[0].before;
+                    }
+
+                    let result = validateConditions(row, localTrigger.conditions);
+                    if (result) {
+                        executeFlowsTrigger(id, row);
+                    }
+                }.bind(null, trigger)
+            });
+
+            connections[trigger.name].on(MySQLEvents.EVENTS.CONNECTION_ERROR, (err) => {
+                logger.error('CONN ERROR', trigger.name, err);
+                delete connections[trigger.name];
+            });
+            
+            connections[trigger.name].on(MySQLEvents.EVENTS.ZONGJI_ERROR, (err) => {
+                logger.error('ZONGJI ERROR', trigger.name, err);
+                delete connections[trigger.name];
+            });
         } catch (err) {
             connections[trigger.name].errors += 1;
             if (connections[trigger.name].errors > 5) {
