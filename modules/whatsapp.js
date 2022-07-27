@@ -58,7 +58,7 @@ class WB {
             }
 
             components.push({
-                type,
+                type: (type == 'file' ? 'document' : type),
                 parameters: component.value.map(item => (formatComponentParameter(component.format.toLowerCase(), item)))
             });
         }
