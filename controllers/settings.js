@@ -2,16 +2,16 @@ const Settings = require('../models/settings');
 
 
 const page = async (req, res) => {
-    let settings = new Settings();
-    let wbi = (await settings.get('wbi'))['value'];
-    let pni = (await settings.get('pni'))['value'];
-    let auth = (await settings.get('auth'))['value'];
+    // let settings = new Settings();
+    // let wbi = (await settings.get('wbi'))['value'];
+    // let pni = (await settings.get('pni'))['value'];
+    // let auth = (await settings.get('auth'))['value'];
 
     res.render('settings', {
         title: 'WS Scheduler',
-        wbi,
-        pni,
-        auth,
+        // wbi,
+        // pni,
+        // auth,
         selected: 'settings'
     });
 }

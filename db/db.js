@@ -180,6 +180,7 @@ class DB {
     query(query) {
         if (!this.connected) {
             this.connect();
+            console.log("conectado a la base de datos");
         }
         return this.db.exec(query);
     }

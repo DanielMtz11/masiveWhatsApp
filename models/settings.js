@@ -23,6 +23,8 @@ class Settings extends Crud {
     }
 
     async get(name) {
+
+        // return ("yes");
         return db.find(this, 'name = \'' + name + '\'');
     }
 

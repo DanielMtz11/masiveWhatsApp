@@ -2,7 +2,7 @@ const passport = require('passport');
 
 const loginPage = (req, res) => {
     res.render('login', {
-        title: 'Ws-Scheduler Login'
+        title: 'Ws-Scheduler '
     });
 }
 
@@ -20,6 +20,7 @@ const logout = (req, res) => {
 
 const isAuthenticated = (req, res, next) => {
     if (req.isAuthenticated()) {
+        console.log(req.body)
         return next();
     }
 
