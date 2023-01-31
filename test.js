@@ -3,8 +3,8 @@ const MySQLEvents = require('@rodrigogs/mysql-events');
 var instance = null;
 const program = async () => {
     instance = new MySQLEvents({
-        host: 'localhost',//'147.185.238.85',
-        user: 'ws-scheduler',
+        host: '78.138.46.28',//'147.185.238.85',
+        user: 'aplicacion',
         password: '4pl1c4c10N01!',
     }, {
         startAtEnd: true,

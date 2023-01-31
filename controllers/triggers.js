@@ -83,14 +83,15 @@ const remove = async (req, res) => {
 }
 
 const activate = async (req, res) => {
+
     let id = req.params.id;
     let trigger = await Triggers.findById(id);
     if (!trigger) res.redirect('/triggers');
-
-    trigger.set({active: req.query.active});
-
+    
+    trigger.set({active: req.query.active}); //this line !!
+    
     let result = await trigger.save();
-    res.json({ result });
+    res.json({message: "this is the req.body", result });
 }
 
 const conditionElement = async (req, res) => {

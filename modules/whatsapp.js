@@ -13,6 +13,8 @@ class WB {
         this.url = process.env.WB_URL;
     }
     
+
+    //reeemplazar con la tabla de outbox
     async sendMessage(phoneNumber, message, type = 'text', flow = {}) {
         let body = {
             messaging_product: "whatsapp",

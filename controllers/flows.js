@@ -27,7 +27,7 @@ async function crudPage(req, res) {
     res.render('crudFlow', {
         title,
         flow: JSON.stringify(flow),
-        messages: req.flash()
+        messages: req.flash("this is flows !!")
     });
 }
 

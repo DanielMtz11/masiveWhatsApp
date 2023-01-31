@@ -15,7 +15,7 @@ const testConnection = async config => {
     let instance = new MySQLEvents({
         host: host.split(':')[0],
         port: host.split(':')[1],
-        user: process.env.DATABASE_USER,
+        user: "aplicacion",
         password,
     }, {
         startAtEnd: true,
@@ -212,7 +212,7 @@ const initializeEventTrigger = async trigger => {
                 connections[trigger.name] = new MySQLEvents({
                     host: host.split(':')[0],
                     port: host.split(':')[1],
-                    user: process.env.DATABASE_USER,
+                    user: "aplicacion",
                     password,
                 }, {
                     startAtEnd: true,
